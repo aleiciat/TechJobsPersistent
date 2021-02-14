@@ -34,7 +34,7 @@ namespace TechJobsPersistent.ViewModels
             Job = theJob;
         }
 
-        public AddJobSkillViewModel()
+        public AddJobSkillViewModel(Job theJob)
         {
         }
     }
