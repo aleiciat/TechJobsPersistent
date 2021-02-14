@@ -24,7 +24,7 @@ namespace TechJobsPersistent.Controllers
 
         public IActionResult Index()
         {
-            List<Job> jobs = context.Jobs.Include(j => j.Employer).ToList();
+            List<Job> jobs = context.Jobs.Include(j => j.Employer).Include(j => j.JobSkills).ToList();
 
             return View(jobs);
         }
@@ -32,42 +32,39 @@ namespace TechJobsPersistent.Controllers
         [HttpGet("/Add")]
         public IActionResult AddJob()
         {
-            List<Employer> employers = context.Employers.ToList();
-            List<Skill> skills = context.Skills.ToList();
-            AddJobViewModel viewModel = new AddJobViewModel(employers, skills);
+            AddJobViewModel viewModel = new AddJobViewModel(context.Employers.ToList(), context.Skills.ToList());
             return View(viewModel);
         }
 
         [HttpPost]
         public IActionResult ProcessAddJobForm(AddJobViewModel addJobViewModel, string[] selectedSkills)
         {
-                if (ModelState.IsValid)
+            if (ModelState.IsValid)
                 {
-                    Job theJob = new Job
+                    Job newJob = new Job
                     {
                         Name = addJobViewModel.Name,
                         EmployerId = addJobViewModel.EmployerId,
-/*                        Employer = context.Employers.Find(addJobViewModel.EmployerId)*/
+                        Employer = context.Employers.Find(addJobViewModel.EmployerId)
                     };
 
-                        foreach(string skill in selectedSkills)
+
+                        for (int i = 0; i < selectedSkills.Length; i++)
                         {
-/*                        var skillId = Int32.Parse(skill);*/
-                        JobSkill jobSkill = new JobSkill
+                            JobSkill newJobSkill = new JobSkill
                             {
-                                JobId = theJob.Id, 
-                                SkillId = int.Parse(skill),
-/*                                Job = theJob*/
+                                JobId = newJob.Id,
+                                SkillId = Int32.Parse(selectedSkills[i]),
+                                Job = newJob
                             };
-                            context.JobSkills.Add(jobSkill);
+                            context.JobSkills.Add(newJobSkill);
                         }
 
-                    context.Jobs.Add(theJob);
+                    context.Jobs.Add(newJob);
                     context.SaveChanges();
-                    return Redirect("/Home");
+                    return Redirect("Index");
                 }
-            addJobViewModel = new AddJobViewModel(context.Employers.ToList(), context.Skills.ToList());
-            return View("AddJob", addJobViewModel);
+            return View("Add", addJobViewModel);
         }
 
         public IActionResult Detail(int id)

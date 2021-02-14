@@ -12,17 +12,17 @@
 
     <div class="form-group">
         <label>Employers</label><br>
-        <select asp-for="EmployerId" asp-items="Model.Employers"></select>
+        <select asp-for="EmployerId" asp-items="@Model.Employers"></select>
         <p><a asp-controller="Employer" asp-action="Add">Add Employer</a></p>
     </div>
 
     <div class="form-group">
         <label>Skills</label><br>
-            @foreach (Skill skill in Model.Skills)
-            {
-                <br><input type="checkbox" name="selectedSkills" value="skills.Id">
-                <label>@skill.Name</label>
-            }
+        @foreach (var skill in Model.Skills)
+        {
+            <input type="checkbox" name="selectedSkills" value="@skill.Id">
+            <label for="@skill.Id">@skill.Name</label><br>
+        }
         <p><a asp-controller="Skill" asp-action="Add">Add Skills</a></p>
     </div>
 
